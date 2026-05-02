@@ -1,12 +1,12 @@
 FTW Modules
 ######################
 
-.. automodule:: {% ftw_ns %}.{% ftw_pn %}
+.. automodule:: ftwpki.server
 
 .. autosummary::
     :toctree: api
     :recursive:
     :template: module_extended.rst
 
-    {% ftw_ns %}.{% ftw_pn %}.cli_parser
-    {% ftw_ns %}.{% ftw_pn %}.programms
+    ftwpki.server.cli_parser
+    ftwpki.server.programms

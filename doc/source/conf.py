@@ -15,7 +15,7 @@ if not html_baseurl:
 
 
 try:
-    from {% ftw_ns %}.{% ftw_pn %}._version import __version__ # type: ignore
+    from ftwpki.server._version import __version__ # type: ignore
     version = __version__ # pyright: ignore[reportUndefinedVariable]
     release = __version__ # pyright: ignore[reportUndefinedVariable]
 except ImportError:
@@ -41,7 +41,7 @@ def setup(app):
 
 
 #SECTION - Project information -----------------------------------------------------
-project = "ftw-{% ftw_pn %}"
+project = "ftw-server"
 copyright = "2026, Fitzz TeΧnik Welt"
 author = "Fitzz TeΧnik Welt"
 html_show_copyright = True
@@ -125,7 +125,7 @@ intersphinx_mapping = {
 #SECTION - Options for ePub output -------------------------------------------------
 from epub_cover import render_cover # pyright: ignore[reportMissingImports]
 if "epub" in sys.argv:
-    epub_cover = render_cover("ftw-{% ftw_pn %}", version.split("+")[0])
+    epub_cover = render_cover("ftw-server", version.split("+")[0])
 
 
 epub_theme = 'epub'
@@ -133,7 +133,7 @@ epub_basename = 'FTW_Development_Tools_Manual'
 epub_title = project
 epub_author = author
 epub_publisher = author
-# epub_identifier = 'https://github.com/{% ftw_ns %}.{% ftw_pn %}.git'
+# epub_identifier = 'https://github.com/ftwpki.server.git'
 epub_scheme = 'URL'
 epub_css_files = ['custom_epub.css']
 # Fügt den Index und Modulindex zum internen Guide hinzu
@@ -195,8 +195,8 @@ autosummary_ignore_module_all = True
 autosummary_context = {}
 
 inherit_diagramm: list[str] = [
-    "{% ftw_ns %}.{% ftw_pn %}.cli_parser",
-    "{% ftw_ns %}.{% ftw_pn %}.protocols",
+    "ftwpki.server.cli_parser",
+    "ftwpki.server.protocols",
 ]
 exclude_inherit_diagramm: list[str] = []
 
@@ -232,7 +232,7 @@ autosummary_context.update(class_extention_context)
 coverage_statistics_to_stdout = True
 coverage_show_missing_items = True
 coverage_modules = [
-    "{% ftw_ns %}.{% ftw_pn %}",
+    "ftwpki.server",
 ]
 
 # NOTE - This list uses REGULAR EXPRESSIONS, not shell-style globs.

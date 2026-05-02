@@ -7,16 +7,16 @@ include-package-data = true
 [tool.setuptools.package-dir]
 "" = "src"
 [tool.setuptools.packages.find]
-include = ["{% ftw_ns %}*",]
+include = ["ftwpki*",]
 namespaces = true
 where = ["src"]
 
 [tool.setuptools_scm]
 tag_regex = '^(?P<prefix>v)?(?P<version>[^\+|-]+)(?P<suffix>-test)?$'
-write_to = "src/{% ftw_ns %}/{% ftw_pn %}/_version.py"
+write_to = "src/ftwpki/server/_version.py"
 
 [project]
-name = "ftw-{% ftw_pn %}"
+name = "ftw-server"
 dynamic = ["version"]
 description = ""
 readme = "README.md"
@@ -44,14 +44,14 @@ classifiers = [
 dependencies = ["platformdirs"]
 
 [project.urls]
-Homepage = "https://github.com/fitzz-ftw/ftw-{% ftw_pn %}"
-Documentation = "https://ftw-{% ftw_pn %}.readthedocs.io/"
-Repository = "https://github.com/fitzz-ftw/ftw-{% ftw_pn %}.git"
-Issues = "https://github.com/fitzz-ftw/ftw-{% ftw_pn %}/issues"
-Changelog = "https://github.com/fitzz-ftw/ftw-{% ftw_pn %}/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/fitzz-ftw/ftw-server"
+Documentation = "https://ftw-server.readthedocs.io/"
+Repository = "https://github.com/fitzz-ftw/ftw-server.git"
+Issues = "https://github.com/fitzz-ftw/ftw-server/issues"
+Changelog = "https://github.com/fitzz-ftw/ftw-server/blob/main/CHANGELOG.md"
 
 [project.scripts]
-ftwchangelog = "{% ftw_ns %}.{% ftw_pn %}.git_shortcuts.programms:prog_ftwchangelog"
+ftwchangelog = "ftwpki.server.git_shortcuts.programms:prog_ftwchangelog"
 
 [project.optional-dependencies]
 doc = [
@@ -66,7 +66,7 @@ doc = [
   "sphinxcontrib-mermaid",
 ]
 
-dev = ["ftw-{% ftw_pn %}[test,doc,lint]", "esbonio==0.16.5"]
+dev = ["ftw-server[test,doc,lint]", "esbonio==0.16.5"]
 lint = ["ruff"]
 test = ["pytest", "pytest-mock", "pytest-cov"]
 
@@ -88,7 +88,7 @@ ignore = ["W293", "W291", "B904"]
 select = ["E", "W", "F", "I", "B"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["{% ftw_ns %}"]
+known-first-party = ["ftwpki"]
 
 [tool.ruff.format]
 indent-style = "space"
@@ -113,7 +113,7 @@ omit = [
   "**/_version.py",
 ]
 
-source = ["{% ftw_ns %}.{% ftw_pn %}"]
+source = ["ftwpki.server"]
 
 [tool.coverage.report]
 exclude_also = [
@@ -129,7 +129,7 @@ show_missing = true
 #
 [tool.coverage.html]
 # Das entspricht --cov-report=html:doc/build/coverage
-directory = "doc/build/test_coverage/{% ftw_pn %}"
+directory = "doc/build/test_coverage/server"
 
 [tool.esbonio.sphinx]
 buildCommand = ["sphinx-build", "-M", "dirhtml", "doc/source", "./_build"]
