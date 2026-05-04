@@ -41,7 +41,7 @@ classifiers = [
     "Programming Language :: Python :: 3.15",
     "Topic :: Security",
 ]
-dependencies = ["platformdirs"]
+dependencies = ["platformdirs", "ftw-pki-libs"]
 
 [project.urls]
 Homepage = "https://github.com/fitzz-ftw/ftw-server"
@@ -68,7 +68,7 @@ doc = [
 
 dev = ["ftw-server[test,doc,lint]", "esbonio==0.16.5"]
 lint = ["ruff"]
-test = ["pytest", "pytest-mock", "pytest-cov"]
+test = ["pytest", "pytest-mock", "pytest-cov","ftw-devtools"]
 
 
 [tool.distutils.egg_info]
@@ -123,7 +123,7 @@ exclude_also = [
   "# py 3.11 only no cover",
   "# not py 3.11 no cover"
 ]
-fail_under = 40
+fail_under = 100
 show_missing = true
 #format = "text"
 #

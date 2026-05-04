@@ -28,10 +28,11 @@ Core Pillars:
   command-line output.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: User Manuals
+   :maxdepth: 1
+   :caption: Quick Start Guide:
 
-   user/git_shortcuts
+   devel/get_started_run_programms.ci
+
 
 .. toctree::
    :maxdepth: 2
