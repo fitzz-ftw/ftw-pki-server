@@ -16,7 +16,7 @@ tag_regex = '^(?P<prefix>v)?(?P<version>[^\+|-]+)(?P<suffix>-test)?$'
 write_to = "src/ftwpki/server/_version.py"
 
 [project]
-name = "ftw-server"
+name = "ftw-pki-server"
 dynamic = ["version"]
 description = ""
 readme = "README.md"
@@ -44,14 +44,14 @@ classifiers = [
 dependencies = ["platformdirs", "ftw-pki-libs"]
 
 [project.urls]
-Homepage = "https://github.com/fitzz-ftw/ftw-server"
-Documentation = "https://ftw-server.readthedocs.io/"
-Repository = "https://github.com/fitzz-ftw/ftw-server.git"
-Issues = "https://github.com/fitzz-ftw/ftw-server/issues"
-Changelog = "https://github.com/fitzz-ftw/ftw-server/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/fitzz-ftw/ftw-pki-server"
+Documentation = "https://ftw-pki-server.readthedocs.io/"
+Repository = "https://github.com/fitzz-ftw/ftw-pki-server.git"
+Issues = "https://github.com/fitzz-ftw/ftw-pki-server/issues"
+Changelog = "https://github.com/fitzz-ftw/ftw-pki-server/blob/main/CHANGELOG.md"
 
 [project.scripts]
-ftwchangelog = "ftwpki.server.git_shortcuts.programms:prog_ftwchangelog"
+ftwpkiservercsr = "ftwpki.server.programms:prog_server_csr"
 
 [project.optional-dependencies]
 doc = [
@@ -66,7 +66,7 @@ doc = [
   "sphinxcontrib-mermaid",
 ]
 
-dev = ["ftw-server[test,doc,lint]", "esbonio==0.16.5"]
+dev = ["ftw-pki-server[test,doc,lint]", "esbonio==0.16.5"]
 lint = ["ruff"]
 test = ["pytest", "pytest-mock", "pytest-cov","ftw-devtools"]
 

@@ -152,12 +152,6 @@ b'-----BEGIN PUBLIC KEY---...
 
 .. !SECTION - Keypair Creation
 
-.. SECTION - Transport encryption
-.. FIXME - Verschlüsselung mit transport-Modul einbauen
-    Kann erst gemacht werden wenn ein userzertifikat
-    vorhanden ist.
-.. !SECTION - Transport encryption
-
 .. SECTION - Save Keys and CSR
 
 >>> from ftwpki.baselibs.core import save_pem

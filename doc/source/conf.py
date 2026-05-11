@@ -231,6 +231,8 @@ epub_exclude_files = [
 
 #SECTION - Options for Mermaid -----------------------------------------------------
 # mermaid_use_local = "_static/mermaid.min.js"
+mermaid_version = "11.14.0"
+mermaid_d3_zoom = True
 #!SECTION - Options for Mermaid -----------------------------------------------------
 
 
