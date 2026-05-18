@@ -44,13 +44,13 @@ Sequenz Diagramm Gesamt
         CA->>CA: Sign Intermediate Certificate (Offline)
         CA-->>S1: Deliver Intermediate Certificate encrypted.
         %% destroy CA
-        note over S1: ftwpkireceiver <br/> programm
+        note over S1: ftwpkiunpacker <br/> programm
         S1->>S1: Decrypt Intermediate Certificate with Intermediate PrivKey
         S2->>S1: Request Intermediate Certificate
         note over S1: ftwpkiintermedsigner <br/> programm
         S1->>S1: Sign Intermediate Certificate for S2
         S1->>S2: Deliver Intermediate Certificate encrypted.
-        note over S2: ftwpkireceiver <br/> programm
+        note over S2: ftwpkiunpacker <br/> programm
         S2->>S2: Decrypt Intermediate Certificate with Intermediate PrivKey   
 
         %% create participant C as Client (End Entity)
@@ -67,7 +67,7 @@ Sequenz Diagramm Gesamt
         deactivate S2
 
         activate C
-        note over C: ftwpkireceiver <br/> programm
+        note over C: ftwpkiunpacker <br/> programm
         C->>C: Decrypt End Entity Certificate with End Entity PrivKey
         deactivate C
 
@@ -83,7 +83,7 @@ Sequenz Diagramm Gesamt
         S2->>U: Deliver End Entity Certificate encrypted.
         deactivate S2
         activate U
-        note over U: ftwpkireceiver <br/> programm
+        note over U: ftwpkiunpacker <br/> programm
         U->>U: Decrypt End Entity Certificate with End Entity PrivKey
         deactivate U
     
@@ -112,7 +112,7 @@ Sequenz Diagramm Gesamt
         deactivate S2
 
         activate C
-        note over C: ftwpkireceiver <br/> programm
+        note over C: ftwpkiunpacker <br/> programm
         C->>C: Decrypt End Entity Certificate with End Entity PrivKey
         deactivate C
 

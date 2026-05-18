@@ -1,3 +1,5 @@
+:orphan:
+
 The Certificat Sign Request Creation
 #########################################
 
@@ -10,12 +12,13 @@ The Certificat Sign Request Creation
 >>> from pathlib import Path
 >>> env = TestHomeEnvironment(Path("doc/source/devel/testhome"))
 >>> env.setup(True)
->>> env.clean_home()
 
 .. !SECTION
 .. SECTION - Prepare
 
 >>> from pathlib import Path
+>>> private_dir:Path = Path("privat")
+>>> private_dir.mkdir(parents=True, exist_ok=True)
 
 >> test_paswd_path = env.copy2cwd("privat/testpasswd")
 >>> conf_file = env.copy2cwd("csr_server_conf.toml")
@@ -25,6 +28,7 @@ The Certificat Sign Request Creation
 ...     return "strenggeheim"
 
 >>> cmd_line="--conf_file csr_server_conf.toml  "
+>>> cmd_line += " --private-dir privat"
 >>> cmd_line += " -hn www.secure.example.org"
 >>> cmd_line += " www-admin@example.org"
 
@@ -33,10 +37,9 @@ The Certificat Sign Request Creation
 >>> sys_argv #doctest: +NORMALIZE_WHITESPACE
 ['--conf_file', 
     'csr_server_conf.toml', 
+    '--private-dir', 'privat', 
     '-hn', 'www.secure.example.org',
     'www-admin@example.org']
-
-
 
 .. !SECTION
 
@@ -48,24 +51,13 @@ The Certificat Sign Request Creation
 
 >>> from ftwpki.baselibs.cli_parser import ServerClientCSRParser, ServerClientCSRProtocol
 
->>> from ftwpki.baselibs.configuration import LeafPKIConfig
-
 >>> from argparse import Namespace
-
->>> config:LeafPKIConfig = LeafPKIConfig()
->>> config.set_config("server")
-
->>> from typing import Any
->>> file_conf:dict[str,Any]={"privatdir":config.private_keys.relative_to(config.config_path).as_posix(),}
 
 >>> default_namespace:Namespace=Namespace()
 >>> default_namespace.password = None
 
 >>> ca_parser: ServerClientCSRParser = ServerClientCSRParser()
-
 >>> ca_parser.set_defaults(**toml2dn(sys_argv))
->>> ca_parser.set_defaults(**file_conf)
-
 >>> args: ServerClientCSRProtocol = ca_parser.parse_args(sys_argv,default_namespace)
 >>> args #doctest: +NORMALIZE_WHITESPACE +ELLIPSIS 
 Namespace(password=None, 
@@ -83,7 +75,7 @@ Namespace(password=None,
     conf_file=...Path('csr_server_conf.toml'), 
     private_key='', 
     public_key='', 
-    privatdir='.private', 
+    privatdir='privat', 
     email='www-admin@example.org', 
     ip_addresses=[], 
     host_names=['www.secure.example.org'])
@@ -91,6 +83,12 @@ Namespace(password=None,
 .. !SECTION - Configuration
 
 .. SECTION - Passwordhandling
+
+
+>> from ftwpki.baselibs.passwd import PasswordManager
+>> pwd_man = PasswordManager(private_dir=args.privatdir)
+>> pwd_man
+PasswordManager(private_dir='privat')
 
 .. !SECTION - Passwordhandling
 
@@ -150,9 +148,9 @@ b'-----BEGIN PRIVATE KEY-...
 >>> pub #doctest: +ELLIPSIS
 b'-----BEGIN PUBLIC KEY---...
 
->>> args.private_key = args.private_key if args.private_key else str(Path(csr_file_name).with_suffix(".key.pem"))
+>>> args.private_key = args.private_key if args.private_key else str(Path(csr_file_name).with_suffix(".key"))
 
->>> args.public_key = args.public_key if args.public_key else str(Path(csr_file_name).with_suffix(config.ext_public))
+>>> args.public_key = args.public_key if args.public_key else str(Path(csr_file_name).with_suffix(".pub"))
 
 .. !SECTION - Keypair Creation
 
@@ -160,9 +158,9 @@ b'-----BEGIN PUBLIC KEY---...
 
 >>> from ftwpki.baselibs.core import save_pem
 >>> save_pem(priv, 
-...     config.config_path / f"{args.privatdir}/{args.private_key}", 
+...     Path(f"{args.privatdir}/{args.private_key}"), 
 ...     is_private=True)
->>> save_pem(pub, config.data_path /f"{args.public_key}", is_private=False)
+>>> save_pem(pub, Path(f"{args.public_key}"), is_private=False)
 
 >>> san_args={"ip_addresses": args.ip_addresses, "dns_names": args.host_names}
 
@@ -173,20 +171,6 @@ b'-----BEGIN PUBLIC KEY---...
 .. !SECTION - Save Keys and CSR
 
 .. !SECTION - Stop programm
-
-.. SECTION - Test existing keys
-
->>> conf_path:Path = config.config_path
->>> public_path:Path = config.data_path
-
->>> (conf_path / ".private"/ "IT-Security-Server.key.pem").is_file()
-True
-
->>> (public_path / "IT-Security-Server.pub.pem").is_file()
-True
-
-
-.. !SECTION - Test existing keys
 
 .. SECTION - Load and read CSR
 
@@ -212,7 +196,7 @@ True
 
 .. SECTION - Teardown
 
->> env.clean_home()
+>>> env.clean_home()
 >>> env.teardown()
 
 .. !SECTION - Teardown

@@ -61,3 +61,5 @@ reports
 #Esbonio
 _build
 piplist.txt
+git-diff.txt
+git-log.txt
