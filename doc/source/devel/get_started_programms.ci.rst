@@ -44,7 +44,7 @@ The Certificat Sign Request Creation
 
 .. SECTION - Configuration
 
->>> from ftwpki.baselibs.toml_utils import toml2dn
+>>> from ftwpki.baselibs.toml_utils import toml2_dn
 
 >>> from ftwpki.baselibs.cli_parser import ServerClientCSRParser, ServerClientCSRProtocol
 
@@ -63,7 +63,7 @@ The Certificat Sign Request Creation
 
 >>> ca_parser: ServerClientCSRParser = ServerClientCSRParser()
 
->>> ca_parser.set_defaults(**toml2dn(sys_argv))
+>>> ca_parser.set_defaults(**toml2_dn(sys_argv))
 >>> ca_parser.set_defaults(**file_conf)
 
 >>> args: ServerClientCSRProtocol = ca_parser.parse_args(sys_argv,default_namespace)
