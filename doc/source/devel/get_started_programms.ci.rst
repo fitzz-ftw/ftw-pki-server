@@ -44,8 +44,9 @@ The Certificat Sign Request Creation
 
 .. SECTION - Configuration
 
->>> from ftwpki.baselibs.toml_utils import toml2_dn
+>>> from ftwpki.baselibs.toml_utils import toml2dn
 
+>>> from ftwpki.baselibs.cli_parser import TomlPreParser
 >>> from ftwpki.baselibs.cli_parser import ServerClientCSRParser, ServerClientCSRProtocol
 
 >>> from ftwpki.baselibs.configuration import LeafPKIConfig
@@ -63,7 +64,15 @@ The Certificat Sign Request Creation
 
 >>> ca_parser: ServerClientCSRParser = ServerClientCSRParser()
 
->>> ca_parser.set_defaults(**toml2_dn(sys_argv))
+>>> pre_parser = TomlPreParser()
+>>> pre_args , _ = pre_parser.parse_known_args(sys_argv)
+
+>>> pre_conf = toml2dn(pre_args.conf_file)
+
+>>> ca_parser.set_defaults(**pre_conf)
+
+
+>> ca_parser.set_defaults(**toml2_dn(sys_argv))
 >>> ca_parser.set_defaults(**file_conf)
 
 >>> args: ServerClientCSRProtocol = ca_parser.parse_args(sys_argv,default_namespace)
