@@ -10,16 +10,17 @@ programms
 Modul programms documentation
 """
 
-from argparse import Namespace
 from pathlib import Path
 
 from cryptography import x509
 
 from ftwpki.baselibs.cert_request import CertificateRequest
-from ftwpki.baselibs.cli_parser import ServerClientCSRParser, ServerClientCSRProtocol, TomlPreParser
-from ftwpki.baselibs.configuration import Any, LeafPKIConfig
+from ftwpki.baselibs.cli_parser import (
+    ServerClientCSRParser_DEV,
+    ServerClientCSRProtocol,
+)
+from ftwpki.baselibs.configuration import BasePKIConfig_DEV, PKIPackage
 from ftwpki.baselibs.core import (
-    create_csr_name,
     create_distinguished_name,
     generate_rsa_key_pair,
     load_private_key_from_pem,
@@ -42,21 +43,16 @@ def prog_server_csr(argv: list[str] | None = None,**kwargs) -> int:
     """
     try:
         # SECTION - Configuration
-        pre_parser = TomlPreParser()
+        pre_parser  = ServerClientCSRParser_DEV(add_help=False, allow_abbrev=False)
         pre_args, _ = pre_parser.parse_known_args(argv)
-        config: LeafPKIConfig = LeafPKIConfig()
+        pki_name = Path(pre_args.conf_file).stem
+        pre_conf = toml2dn(pre_args.conf_file)
+        pre_conf["pki_name"] = pki_name
+        ca_parser: ServerClientCSRParser_DEV = ServerClientCSRParser_DEV(**kwargs)
+        ca_parser.set_defaults(**pre_conf)
+        args: ServerClientCSRProtocol = ca_parser.parse_args(argv)
+        config: BasePKIConfig_DEV = BasePKIConfig_DEV(args.conf_file)
         config.set_config("server")
-        file_conf: dict[str, Any] = {
-            "privatdir": config.private_keys.relative_to(config.config_path).as_posix(),
-        }
-        default_namespace: Namespace = Namespace()
-        default_namespace.password = None
-        ca_parser: ServerClientCSRParser = ServerClientCSRParser(**kwargs)
-        ca_parser.set_defaults(**toml2dn(pre_args.conf_file)) if pre_args.conf_file else ...
-        # ca_parser.set_defaults(**toml2_dn(argv))
-        ca_parser.set_defaults(**file_conf)
-        args: ServerClientCSRProtocol = ca_parser.parse_args(argv, default_namespace)
-
         # !SECTION - Configuration
         # SECTION - CSR Creation
         subject: x509.Name = create_distinguished_name(
@@ -67,7 +63,6 @@ def prog_server_csr(argv: list[str] | None = None,**kwargs) -> int:
             common_name=args.commonName,
             organizational_unit=args.organizationalUnitName,
         )
-        csr_file_name: str = create_csr_name(args.commonName)
         server_csr: CertificateRequest = CertificateRequest(
             subject=subject,
             policy=ServerPolicy(),
@@ -77,36 +72,37 @@ def prog_server_csr(argv: list[str] | None = None,**kwargs) -> int:
         # SECTION - Keypair Creation
         priv, pub = generate_rsa_key_pair(passphrase=args.password, key_size=4096) 
 
-        args.private_key = (
-            args.private_key 
-            if args.private_key 
-            else str(Path(csr_file_name).with_suffix(".key.pem"))
-        )  
-
-        args.public_key = (
-            args.public_key
-            if args.public_key
-            else str(Path(csr_file_name).with_suffix(config.ext_public))
-        )  
-
         # !SECTION - Keypair Creation
-        # SECTION - Save Keys and CSR
-        save_pem(priv, config.config_path / f"{args.privatdir}/{args.private_key}", is_private=True)
-        save_pem(pub, config.data_path / f"{args.public_key}", is_private=False)
+        # SECTION - Save private Key
+        save_pem(priv, 
+                 config.private_keys/args.private_key, 
+                 is_private=True)
+        # !SECTION - Save private Key
+
+        # SECTION - Save CSR
+
         san_args={"ip_addresses": args.ip_addresses, "dns_names": args.host_names}
 
-        save_pem(
-            server_csr.build(
+        server_pem = server_csr.build(
                 load_private_key_from_pem(pem_data=priv, passphrase=args.password),
                 **san_args,
-            ).get_pem(),
-            Path(csr_file_name),
-            is_private=False,
-        )
-        # !SECTION - Save Keys and CSR
+            ).get_pem()
+        save_pem(server_pem, 
+                 Path(f"{args.pki_name + '.csr'}"), 
+                 is_private=False)
+        # !SECTION - Save CSR
+        # SECTION - pki- Container
+        pki_pack = PKIPackage()
+        conf_file = Path(args.conf_file)
+        pki_pack.additional_files[f"{args.pki_name}.id.toml"]=conf_file.read_bytes()
+        _ = pki_pack.save(config.pki_path/ args.pki_name)
+        # !SECTION - pki- Container
+        # SECTION - Cleanup
+        conf_file.unlink()
+        # !SECTION - Cleanup
         return 0
     except Exception as e:
-        print(f"Error in {ca_parser.prog}: {e}")
+        print(f"Error: {e}")
         return 1
 
 if __name__ == "__main__":  # pragma: no cover
@@ -123,7 +119,8 @@ if __name__ == "__main__":  # pragma: no cover
     testfiles_dir = Path(__file__).parents[3] / "doc/source/devel"
     test_files = [
         # "get_started_programms.ci.rst",
-        "get_started_programms_DEV.ci.rst",
+        # "get_started_programms_DEV.ci.rst",
+        "get_started_run_programms_DEV.ci.rst",
         # "get_started_run_programms.ci.rst",
     ]
     for file in test_files:
