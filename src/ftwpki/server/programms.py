@@ -10,6 +10,7 @@ programms
 Modul programms documentation
 """
 
+import traceback
 from pathlib import Path
 
 from cryptography import x509
@@ -45,9 +46,11 @@ def prog_server_csr(argv: list[str] | None = None,**kwargs) -> int:
         # SECTION - Configuration
         pre_parser  = ServerClientCSRParser(add_help=False, allow_abbrev=False)
         pre_args, _ = pre_parser.parse_known_args(argv)
-        pki_name = Path(pre_args.conf_file).stem
-        pre_conf = toml2dn(Path(pre_args.conf_file).read_text())
-        pre_conf["pki_name"] = pki_name
+        pre_conf = {}
+        if pre_args.conf_file:
+            pki_name = Path(pre_args.conf_file).stem
+            pre_conf = toml2dn(Path(pre_args.conf_file).read_text())
+            pre_conf["pki_name"] = pki_name
         ca_parser: ServerClientCSRParser = ServerClientCSRParser(**kwargs)
         ca_parser.set_defaults(**pre_conf)
         args: ServerClientCSRProtocol = ca_parser.parse_args(argv)
@@ -102,6 +105,7 @@ def prog_server_csr(argv: list[str] | None = None,**kwargs) -> int:
         # !SECTION - Cleanup
         return 0
     except Exception as e:
+        traceback.print_exc()
         print(f"Error: {e}")
         return 1
 

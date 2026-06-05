@@ -25,7 +25,7 @@ The Certificat Sign Request Creation
 
 >>> cmd_line="--conf-file member_server.toml  "
 >>> cmd_line += " -k mem-serv"
->>> cmd_line += " -hn www.secure.example.org"
+>>> cmd_line += " -dns www.secure.example.org"
 >>> cmd_line += " www-admin@example.org"
 
 >>> import shlex
@@ -34,7 +34,7 @@ The Certificat Sign Request Creation
 ['--conf-file', 
     'member_server.toml',
     '-k', 'mem-serv',
-    '-hn', 'www.secure.example.org',
+    '-dns', 'www.secure.example.org',
     'www-admin@example.org']
 
 >>> import ftwpki.server.programms as testing
@@ -45,6 +45,24 @@ The Certificat Sign Request Creation
 
 >>> prog_server_csr(sys_argv)
 0
+
+>>> cmd_line = " -k mem-serv"
+>>> cmd_line += " -dns www.secure.example.org"
+>>> cmd_line += " www-admin@example.org"
+
+>>> sys_argv= shlex.split(cmd_line) 
+
+>>> prog_server_csr(sys_argv)
+Error: the following arguments are required: --conf-file
+1
+
+>>> cmd_line="--conf-file member_server.toml  "
+>>> cmd_line += " -k mem-serv"
+>>> cmd_line += " -dns www.secure.example.org"
+>>> cmd_line += " www-admin@example.org"
+
+>>> sys_argv= shlex.split(cmd_line) 
+
 
 >>> conf_file = env.copy2cwd(f"{test_data_pre}/leaf_server_members_conf.toml", "member_server.toml")
 
