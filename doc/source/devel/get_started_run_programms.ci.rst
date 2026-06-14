@@ -5,7 +5,7 @@ The Certificat Sign Request Creation
 
 
 .. SECTION - Setup
->>> test_data_pre= "test_ok_data"
+>>> test_data_pre= "data-server"
 
 >>> from fitzzftw.devtools.testinfra import TestHomeEnvironment
 >>> from pathlib import Path
@@ -18,12 +18,12 @@ The Certificat Sign Request Creation
 
 >>> from pathlib import Path
 
->>> conf_file = env.copy2cwd(f"{test_data_pre}/leaf_server_members_conf.toml", "member_server.toml")
+>>> conf_file = env.copy2cwd(f"{test_data_pre}/M-V-HH-Members.toml", "M-V-HH-Members.toml")
 
->>> def stub_exception(*args):
+>>> def stub_exception(*args,**kwargs):
 ...     raise Exception("This is a testexception")
 
->>> cmd_line="--conf-file member_server.toml  "
+>>> cmd_line="--conf-file M-V-HH-Members.toml  "
 >>> cmd_line += " -k mem-serv"
 >>> cmd_line += " -dns www.secure.example.org"
 >>> cmd_line += " www-admin@example.org"
@@ -32,12 +32,12 @@ The Certificat Sign Request Creation
 >>> sys_argv= shlex.split(cmd_line) 
 >>> sys_argv #doctest: +NORMALIZE_WHITESPACE
 ['--conf-file', 
-    'member_server.toml',
+    'M-V-HH-Members.toml',
     '-k', 'mem-serv',
     '-dns', 'www.secure.example.org',
     'www-admin@example.org']
 
->>> import ftwpki.server.programms as testing
+>>> import ftwpki.baselibs.workflows as testing
 
 .. !SECTION - Prepare
 
@@ -56,7 +56,7 @@ The Certificat Sign Request Creation
 Error: the following arguments are required: --conf-file
 1
 
->>> cmd_line="--conf-file member_server.toml  "
+>>> cmd_line="--conf-file M-V-HH-Members.toml  "
 >>> cmd_line += " -k mem-serv"
 >>> cmd_line += " -dns www.secure.example.org"
 >>> cmd_line += " www-admin@example.org"
@@ -64,9 +64,11 @@ Error: the following arguments are required: --conf-file
 >>> sys_argv= shlex.split(cmd_line) 
 
 
->>> conf_file = env.copy2cwd(f"{test_data_pre}/leaf_server_members_conf.toml", "member_server.toml")
+>>> conf_file = env.copy2cwd(f"{test_data_pre}/M-V-HH-Members.toml", "M-V-HH-Members.toml")
 
->>> testing.toml2dn = stub_exception
+>>> testing.generate_rsa_key_pair = stub_exception
+
+>> testing.generate_rsa_key_pair
 
 >>> prog_server_csr(sys_argv)
 Error: This is a testexception
