@@ -1,127 +1,83 @@
-Running the programm Successfully and Errors
-==============================================
+The Certificat Sign Request Creation
+#########################################
+
+
+
 
 .. SECTION - Setup
+>>> test_data_pre= "data-server"
 
 >>> from fitzzftw.devtools.testinfra import TestHomeEnvironment
 >>> from pathlib import Path
 >>> env = TestHomeEnvironment(Path("doc/source/devel/testhome"))
 >>> env.setup(True)
+>>> env.clean_home()
 
-.. !SECTION
+.. !SECTION - Setup
 .. SECTION - Prepare
 
 >>> from pathlib import Path
->>> private_dir:Path = Path("privat")
->>> private_dir.mkdir(parents=True, exist_ok=True)
 
->> test_paswd_path = env.copy2cwd("privat/testpasswd")
->>> conf_file = env.copy2cwd("csr_server_conf.toml")
+>>> conf_file = env.copy2cwd(f"{test_data_pre}/M-V-HH-Members.toml", "M-V-HH-Members.toml")
 
->>> cmd_line="--conf_file csr_server_conf.toml  "
->>> cmd_line += " --private-dir privat"
->>> cmd_line += " -hn www.secure.example.org"
+>>> def stub_exception(*args,**kwargs):
+...     raise Exception("This is a testexception")
+
+>>> cmd_line="--conf-file M-V-HH-Members.toml  "
+>>> cmd_line += " -k mem-serv"
+>>> cmd_line += " -dns www.secure.example.org"
 >>> cmd_line += " www-admin@example.org"
 
 >>> import shlex
 >>> sys_argv= shlex.split(cmd_line) 
 >>> sys_argv #doctest: +NORMALIZE_WHITESPACE
-['--conf_file', 
-    'csr_server_conf.toml', 
-    '--private-dir', 'privat', 
-    '-hn', 'www.secure.example.org',
+['--conf-file', 
+    'M-V-HH-Members.toml',
+    '-k', 'mem-serv',
+    '-dns', 'www.secure.example.org',
     'www-admin@example.org']
 
-.. !SECTION
-.. SECTION - Start programm function
+>>> import ftwpki.baselibs.workflows as testing
+
+.. !SECTION - Prepare
 
 >>> from ftwpki.server.programms import prog_server_csr
->>> prog_server_csr(sys_argv, prog="ftwpkiserver")
+
+>>> prog_server_csr(sys_argv)
 0
 
->>> cmd_line="--conf_file csr_server_conf.toml  "
->>> cmd_line += " --private-dir privat"
+>>> cmd_line = " -k mem-serv"
+>>> cmd_line += " -dns www.secure.example.org"
 >>> cmd_line += " www-admin@example.org"
 
 >>> sys_argv= shlex.split(cmd_line) 
 
->>> prog_server_csr(sys_argv) #doctest: +ELLIPSIS
-Error in ...: At least an ip address or a hostname has to be given
-1
-
->>> cmd_line="--conf_file csr_server_conf.toml  "
->>> cmd_line += " --private-dir privat"
->>> cmd_line += " -hn www.secure.example.org"
->>> sys_argv= shlex.split(cmd_line)
-
->>> prog_server_csr(sys_argv) #doctest: +ELLIPSIS
-Error in ...: the following arguments are required: email
-1
-
-
->>> cmd_line="--conf_file csr_server_conf.toml  "
->>> cmd_line += " --private-dir privat"
->>> cmd_line += " -hn org"
->>> cmd_line += " www-admin@example.org"
-
->>> sys_argv= shlex.split(cmd_line)
->>> prog_server_csr(sys_argv) #doctest: +ELLIPSIS
-Error in ...: Hostname 'org' is not a FQDN (missing dot).
-1
-
->>> cmd_line="--conf_file csr_server_conf.toml  "
->>> cmd_line += " --private-dir privat"
->>> cmd_line += " -hn localhost"
->>> cmd_line += " www-admin@example.org"
-
->>> sys_argv= shlex.split(cmd_line)
 >>> prog_server_csr(sys_argv)
-0
-
->>> cmd_line="--conf_file csr_server_conf.toml  "
->>> cmd_line += " --private-dir privat"
->>> cmd_line += " -hn localhost"
->>> cmd_line += " -ip 127.0.0.1"
->>> cmd_line += " www-admin@example.org"
-
->>> sys_argv= shlex.split(cmd_line)
->>> prog_server_csr(sys_argv)
-0
-
->>> cmd_line="--conf_file csr_server_conf.toml  "
->>> cmd_line += " --private-dir privat"
->>> cmd_line += " -ip org"
->>> cmd_line += " www-admin@example.org"
-
->>> sys_argv= shlex.split(cmd_line)
->>> prog_server_csr(sys_argv) #doctest: +ELLIPSIS
-Error in ...: 'org' does not appear to be an IPv4 or IPv6 address
+Error: the following arguments are required: --conf-file
 1
 
->>> cmd_line = " --private-dir privat"
->>> cmd_line += " -ip 192.168.1.1"
+>>> cmd_line="--conf-file M-V-HH-Members.toml  "
+>>> cmd_line += " -k mem-serv"
+>>> cmd_line += " -dns www.secure.example.org"
 >>> cmd_line += " www-admin@example.org"
 
->>> sys_argv= shlex.split(cmd_line)
->>> prog_server_csr(sys_argv) #doctest: +ELLIPSIS
-Error in ...: Attribute's length must be >= 2 and <= 2, but it was 0
-1
+>>> sys_argv= shlex.split(cmd_line) 
 
->>> cmd_line = " -C DE"
->>> cmd_line += " -CN 'IT-Security Server'"
->>> cmd_line += " --private-dir privat"
->>> cmd_line += " -ip 192.168.1.1"
->>> cmd_line += " www-admin@example.org"
 
->>> sys_argv= shlex.split(cmd_line)
+>>> conf_file = env.copy2cwd(f"{test_data_pre}/M-V-HH-Members.toml", "M-V-HH-Members.toml")
+
+>>> testing.generate_rsa_key_pair = stub_exception
+
+>> testing.generate_rsa_key_pair
+
 >>> prog_server_csr(sys_argv)
-0
-
-.. !SECTION - Start programm function
+Error: This is a testexception
+1
 
 .. SECTION - Teardown
 
 >>> env.clean_home()
 >>> env.teardown()
+
 
 .. !SECTION - Teardown

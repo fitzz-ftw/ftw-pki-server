@@ -1,0 +1,6 @@
+[identity.dn]
+countryName = "DE"
+organizationName = "Muster-Verband e.V."
+commonName = "intern.example.org"
+localityName = "Hamburg"
+organizationalUnitName = "Infrastruktur und Dienste"

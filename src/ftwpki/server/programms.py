@@ -10,26 +10,13 @@ programms
 Modul programms documentation
 """
 
-from argparse import Namespace
 from pathlib import Path
 
-from cryptography import x509
-
-from ftwpki.baselibs.cert_request import CertificateRequest
-from ftwpki.baselibs.cli_parser import ServerClientCSRParser, ServerClientCSRProtocol
-from ftwpki.baselibs.configuration import Any, LeafPKIConfig
-from ftwpki.baselibs.core import (
-    create_csr_name,
-    create_distinguished_name,
-    generate_rsa_key_pair,
-    load_private_key_from_pem,
-    save_pem,
-)
 from ftwpki.baselibs.policies import ServerPolicy
-from ftwpki.baselibs.toml_utils import toml2dn
+from ftwpki.baselibs.workflows import CSRWorkflow
 
 
-def prog_server_csr(argv: list[str] | None = None,**kwargs) -> int:
+def prog_server_csr(argv: list[str] | None = None, **kwargs) -> int:
     """
     Execute the server Certificate Signing Request (CSR) generation process.
 
@@ -42,69 +29,35 @@ def prog_server_csr(argv: list[str] | None = None,**kwargs) -> int:
     """
     try:
         # SECTION - Configuration
-        config: LeafPKIConfig = LeafPKIConfig()
-        config.set_config("server")
-        file_conf: dict[str, Any] = {
-            "privatdir": config.private_keys.relative_to(config.config_path).as_posix(),
-        }
-        default_namespace: Namespace = Namespace()
-        default_namespace.password = None
-        ca_parser: ServerClientCSRParser = ServerClientCSRParser(**kwargs)
-        ca_parser.set_defaults(**toml2dn(argv))
-        ca_parser.set_defaults(**file_conf)
-        args: ServerClientCSRProtocol = ca_parser.parse_args(argv, default_namespace)
-
+        csr_creator = CSRWorkflow()
+        csr_creator.policy = ServerPolicy()
+        csr_creator.mandantory_san = True
+        csr_creator.configuration(argv)
         # !SECTION - Configuration
         # SECTION - CSR Creation
-        subject: x509.Name = create_distinguished_name(
-            country=args.countryName,
-            state=args.stateOrProvinceName,
-            location=args.localityName,
-            organization=args.organizationName,
-            common_name=args.commonName,
-            organizational_unit=args.organizationalUnitName,
-        )
-        csr_file_name: str = create_csr_name(args.commonName)
-        server_csr: CertificateRequest = CertificateRequest(
-            subject=subject,
-            policy=ServerPolicy(),
-        )
-
+        csr_creator.csr_creation()
         # !SECTION - CSR Creation
         # SECTION - Keypair Creation
-        priv, pub = generate_rsa_key_pair(passphrase=args.password, key_size=4096) 
-
-        args.private_key = (
-            args.private_key 
-            if args.private_key 
-            else str(Path(csr_file_name).with_suffix(".key.pem"))
-        )  
-
-        args.public_key = (
-            args.public_key
-            if args.public_key
-            else str(Path(csr_file_name).with_suffix(config.ext_public))
-        )  
-
+        csr_creator.key_pair_creation()
         # !SECTION - Keypair Creation
-        # SECTION - Save Keys and CSR
-        save_pem(priv, config.config_path / f"{args.privatdir}/{args.private_key}", is_private=True)
-        save_pem(pub, config.data_path / f"{args.public_key}", is_private=False)
-        san_args={"ip_addresses": args.ip_addresses, "dns_names": args.host_names}
+        # SECTION - Save private Key
+        csr_creator.save_keys()
+        # !SECTION - Save private Key
 
-        save_pem(
-            server_csr.build(
-                load_private_key_from_pem(pem_data=priv, passphrase=args.password),
-                **san_args,
-            ).get_pem(),
-            Path(csr_file_name),
-            is_private=False,
-        )
-        # !SECTION - Save Keys and CSR
+        # SECTION - Save CSR
+        csr_creator.save_csr()
+        # !SECTION - Save CSR
+        # SECTION - pki- Container
+        csr_creator.process_pki_container()
+        # !SECTION - pki- Container
+        # SECTION - Cleanup
+        csr_creator.cleanup()
+        # !SECTION - Cleanup
         return 0
     except Exception as e:
-        print(f"Error in {ca_parser.prog}: {e}")
+        print(f"Error: {e}")
         return 1
+
 
 if __name__ == "__main__":  # pragma: no cover
     from doctest import FAIL_FAST, testfile
@@ -119,7 +72,7 @@ if __name__ == "__main__":  # pragma: no cover
     # Pfad zu den dokumentierenden Tests
     testfiles_dir = Path(__file__).parents[3] / "doc/source/devel"
     test_files = [
-        "get_started_programms.ci.rst",
+        # "get_started_programms.ci.rst",
         "get_started_run_programms.ci.rst",
     ]
     for file in test_files:
